@@ -36,13 +36,6 @@ var Cell = cell.Module(
 	cell.Provide(newMCSAPICRDs),
 )
 
-var ServiceExportSyncCell = cell.Module(
-	"service-export-sync",
-	"Synchronizes Kubernetes ServiceExports to KVStore",
-
-	cell.Invoke(registerServiceExportSync),
-)
-
 type mcsAPIParams struct {
 	cell.In
 
@@ -70,7 +63,7 @@ var requiredGVK = []schema.GroupVersionKind{
 	mcsapiv1beta1.SchemeGroupVersion.WithKind("serviceexports"),
 }
 
-func checkCRD(ctx context.Context, clientset k8sClient.Clientset, gvk schema.GroupVersionKind) error {
+func CheckCRD(ctx context.Context, clientset k8sClient.Clientset, gvk schema.GroupVersionKind) error {
 	if !clientset.IsEnabled() {
 		return nil
 	}
@@ -97,7 +90,7 @@ func checkCRD(ctx context.Context, clientset k8sClient.Clientset, gvk schema.Gro
 func checkRequiredCRDs(ctx context.Context, clientset k8sClient.Clientset) error {
 	var res error
 	for _, gvk := range requiredGVK {
-		if err := checkCRD(ctx, clientset, gvk); err != nil {
+		if err := CheckCRD(ctx, clientset, gvk); err != nil {
 			res = errors.Join(res, err)
 		}
 	}
